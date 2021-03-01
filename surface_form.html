@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<link rel="stylesheet" href="index.css">
+
+<div id="surfaceForm"></div>
+
+<script src="//cdn.staticfile.org/vue/2.6.12/vue.min.js"></script>
+<script src="//cdn.staticfile.org/axios/0.19.0-beta.1/axios.min.js"></script>
+
+<script src="index.js"></script>
+<script src="form-create.js"></script>
+<script src="surface-form.js"></script>
+
+
+<script src="NKeditor/NKeditor-all.js"></script>
+<script src="NKeditor/jquery.min.js"></script>
+
+<script>
+
+    ;(function () {
+        Vue.config.devtools = true;
+
+        let form = {
+            "global": {
+                "upload": {
+                    "props": {
+                        "manageShow": true,
+                        "manageUrl": "\/images.php",
+                        "action": "\/upload.php",
+                        "name": "file",
+                        "uploadType": "image",
+                        "multiple": false,
+                        "maxLength": 1,
+                        "accept": "image\\\/*"
+                    }
+                },
+                "take": {"props": {"unique": true, "maxLength": 9}},
+                "range": {"props": {"range": true}},
+                "select": {"props": {"multiple": true, "filterable": true}},
+                "frame": {"props": {"icon": "el-icon-plus", "height": "550px", "width": "976px"}},
+                "editor": {
+                    "props": {
+                        "theme": "black",
+                        "items": null,
+                        "editorUploadUrl": "\/upload.php",
+                        "editorManageUrl": "\/images.php",
+                        "editorMediaUrl": "\/upload.php",
+                        "editorFlashUrl": "\/upload.php",
+                        "editorFileUrl": "\/upload.php"
+                    }
+                }
+            }, "resetBtn": true, "async": {"url": "\/data.php"}, "form": {"labelWidth": "100px"}
+        };
+
+        window.$surfaceForm = surfaceForm.create(
+            [
+                {
+                    "type": "input",
+                    "field": "username",
+                    "title": "用户名",
+                    "value": "",
+                    "suffix": {
+                        "type": "span",
+                        "class": "s-marker",
+                        "domProps": {"innerHTML": "要不得"}
+                    },
+                    "validate": [{"required": true, "message": "用户名必须"}],
+                    "children": [{"type": "span", "domProps": {"innerText": "元"}, "slot": "append"}]
+                }, {"type": "input", "field": "info", "title": "说明", "value": ""}, {
+                "type": "inputNumber",
+                "field": "price",
+                "title": "价格",
+                "value": "",
+                "props": {"step": 5}
+            }, {
+                "type": "select",
+                "field": "hobby",
+                "title": "爱好",
+                "value": "",
+                "options": [{"value": 1, "label": "干饭"}, {"value": 2, "label": "打麻将"}, {
+                    "value": 3,
+                    "label": "睡觉"
+                }, {"value": 4, "label": "爬山"}],
+                "props": {"multiple": true}
+            }, {
+                "type": "checkbox",
+                "field": "label",
+                "title": "标签",
+                "value": [],
+                "options": [{"value": 1, "label": "干饭"}, {"value": 2, "label": "打麻将"}, {
+                    "value": 3,
+                    "label": "睡觉"
+                }, {"value": 4, "label": "爬山"}]
+            }, {"type": "switch", "field": "postage", "title": "包邮", "value": 0}, {
+                "type": "datePicker",
+                "field": "section_day",
+                "title": "日期",
+                "value": "",
+                "props": {
+                    "type": "datetimerange",
+                    "format": "yyyy-MM-dd HH:mm:ss",
+                    "placeholder": "请选择活动日期"
+                }
+            }, {
+                "type": "timePicker",
+                "field": "section_time",
+                "title": "时间",
+                "value": "",
+                "props": {"isRange": true}
+            }, {
+                "type": "ColorPicker",
+                "field": "color",
+                "title": "颜色",
+                "value": "#333333"
+            }, {"type": "rate", "field": "rate", "title": "评分", "value": 2}, {
+                "type": "Slider",
+                "field": "slider",
+                "title": "范围",
+                "value": [15, 27],
+                "props": {"min": 10, "max": 30, "range": true}
+            }, {
+                "type": "tree",
+                "field": "tree",
+                "title": "树",
+                "value": "",
+                "props": {
+                    "type": "checked",
+                    "defaultExpandAll": true,
+                    "checkOnClickNode": true,
+                    "expandOnClickNode": false,
+                    "multiple": true,
+                    "showCheckbox": true,
+                    "data": [{
+                        "id": 1,
+                        "title": "a",
+                        "expand": true,
+                        "selected": false,
+                        "children": [{
+                            "id": 101,
+                            "title": "a1",
+                            "expand": true,
+                            "children": [{"id": 10101, "title": "a11"}]
+                        }]
+                    }],
+                    "props": {"label": "title"}
+                }
+            }, {
+                "type": "editor",
+                "field": "content",
+                "title": "说明",
+                "value": "<h1>666<\/h1>"
+            }, {
+                "type": "upload",
+                "field": "avatar",
+                "title": "头像",
+                "value": "",
+                "props": {"maxLength": 5}
+            }, {
+                "type": "Group",
+                "field": "group",
+                "title": "配置",
+                "value": [{"username": "张三", "age": 18, "hobby": "干饭"}],
+                "props": {
+                    "rules": [{
+                        "type": "input",
+                        "field": "username",
+                        "title": "用户名",
+                        "value": ""
+                    }, {"type": "input", "field": "age", "title": "年龄", "value": ""}, {
+                        "type": "input",
+                        "field": "hobby",
+                        "title": "爱好",
+                        "value": ""
+                    }]
+                }
+            }, {
+                "type": "Object",
+                "field": "object",
+                "title": "json配置",
+                "value": {"username": "666", "age": 18},
+                "props": {
+                    "rule": [{
+                        "type": "input",
+                        "field": "username",
+                        "title": "用户名",
+                        "value": ""
+                    }, {"type": "inputNumber", "field": "age", "title": "爱好", "value": ""}]
+                }
+            }, {
+                "type": "radio",
+                "field": "examine",
+                "title": "审核",
+                "value": "ok",
+                "options": [{"value": "ok", "label": "通过"}, {"value": "no", "label": "拒绝"}],
+                "control": [{
+                    "value": "no",
+                    "rule": [{"type": "editor", "field": "reason", "title": "拒绝理由", "value": ""}]
+                }],
+                "suffix": {"type": "span", "class": "s-marker", "domProps": {"innerHTML": "hahaha"}}
+            }, {
+                "type": "checkbox",
+                "field": "tab",
+                "title": "tab选择",
+                "value": [],
+                "options": [{"value": 1, "label": "干饭"}, {"value": 2, "label": "打麻将"}],
+                "control": [{
+                    "handle": "val.indexOf(1) >= 0",
+                    "rule": [{"type": "input", "field": "tabInput1", "title": "选择1", "value": ""}]
+                }, {
+                    "handle": "val.indexOf(2) >= 0",
+                    "rule": [{"type": "input", "field": "tabInput2", "title": "选择2", "value": ""}]
+                }]
+            }, {
+                "type": "take",
+                "field": "user_id",
+                "title": "联合选择",
+                "value": [1, 2, 3],
+                "options": [
+                    {"value": 1, "label": "张三"},
+                    {
+                        "value": 2,
+                        "label": "<img src=\"http:\/\/q1.qlogo.cn\/g?b=qq&nk=191587823&s=640\" class=\"take-img\"> 李四"
+                    },
+                    {
+                        "value": 3,
+                        "label": "<img src=\"http:\/\/q1.qlogo.cn\/g?b=qq&nk=191587106&s=640\" class=\"take-img\"> 李四"
+                    }
+                ],
+                "props": {"src": "\/"}
+            }], {el: document.getElementById('surfaceForm'), ...form})
+
+    }())
+
+</script>
+
+
+</body>
+</html>

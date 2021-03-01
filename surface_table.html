@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<link rel="stylesheet" href="index.css">
+
+<div id="surfaceTable"></div>
+
+<script src="//cdn.staticfile.org/vue/2.6.12/vue.min.js"></script>
+<script src="//cdn.staticfile.org/axios/0.19.0-beta.1/axios.min.js"></script>
+<script src="index.js"></script>
+<script src="surface-table.js"></script>
+
+<script>
+
+    ;(function () {
+        Vue.config.devtools = true;
+
+        let data = {
+            header: {
+                el: 'div',
+                style: {padding: '20px'},
+                children: [
+                    {
+                        el: 's-button',
+                        props: {
+                            // confirmMsg: '认真的吗？',
+                            prop: {
+                                type: 'text',
+                                icon: 'el-icon-check',
+                            },
+                            async: {
+                                url: "http://localhost:555/data.php", // 请求地址
+                                data: {name: 'hello'}, // 附加参数
+                            },
+                            handler: 'submit',
+                        }
+                    },
+                    {
+                        el: 's-button',
+                        props: {
+                            prop: {
+                                type: 'text',
+                                icon: 'el-icon-refresh'
+                            },
+                            handler: 'refresh',
+                        }
+                    },
+                ],
+            },
+            pagination: {
+                props: {
+                    // async: { // 异步请求
+                    //     url: "http://localhost:555/data.php", // 请求地址
+                    //     data: {name: 'hello'}, // 附加参数
+                    // },
+                    total: 0
+                },
+                style: {
+                    'text-align': 'center'
+                }
+            },
+            options: {
+                props: {
+                    emptyText: '没有啦 还看',
+                    data: [
+                        {
+                            id: 4,
+                            date: '2016-05-03',
+                            name: '王小虎4',
+                            sex: 2,
+                            area: '重庆市',
+                            address: '上海市普陀区金沙江路上海市普陀区金沙江路 1516 弄',
+                            def: false
+                        }
+                    ],
+                },
+            },
+            columns: [
+                {
+                    props: {
+                        prop: "id",
+                        label: "ID",
+                        type: "selection",
+                        width: "55"
+                    }
+                },
+                {
+                    props: {
+                        type: "expand",
+                        prop: "address",
+                        label: "详细地址",
+                        'show-overflow-tooltip': true,
+                    },
+                    scopedSlots: [
+                        {
+                            el: 'el-tag',
+                            inject: ['children']
+                        }
+                    ],
+                },
+                {
+                    props: {
+                        prop: "name",
+                        label: "姓名",
+                        sortable: true,
+                    },
+                },
+                {
+                    props: {
+                        prop: "name",
+                        label: "姓名",
+                        align: 'center',
+                        sortable: true,
+                    },
+                    scopedSlots: [
+                        {
+                            el: 's-editable',
+                            props: {
+                                type: 'text',
+                                async: {
+                                    extends: ['id'],
+                                    url: "/surface.html", // 请求地址
+                                    data: {name: 'hello'}, // 附加参数
+                                    method: "POST", // 请求方式
+                                },
+                            }
+                        }
+                    ],
+                },
+                {
+                    props: {
+                        prop: "sex",
+                        label: "性别",
+                    },
+                    scopedSlots: [
+                        {
+                            el: 's-editable',
+                            props: {
+                                type: 'select',
+                                async: {
+                                    extends: ['id'],
+                                    url: "/surface.html", // 请求地址
+                                    data: {name: 'hello'}, // 附加参数
+                                    method: "POST", // 请求方式
+                                },
+                                options: {
+                                    1: '男',
+                                    2: '女',
+                                    3: '未知',
+                                },
+                            }
+                        }
+                    ]
+                },
+                {
+                    props: {
+                        prop: "area",
+                        label: "省市区",
+                    },
+                    scopedSlots: [
+                        {
+                            el: 'el-tag',
+                            // inject: 'children',
+                            inject: ['children', 'title'],
+                            // inject: function (node) {
+                            //     let props = node.props
+                            //     node.children = [props.row[props.column.property]]
+                            // }
+                        }
+                    ]
+                },
+                {
+                    props: {
+                        prop: "def",
+                        label: "默认",
+                    },
+                    scopedSlots: [
+                        {
+                            el: 's-editable',
+                            props: {
+                                type: 'switcher',
+                                async: {
+                                    extends: ['id'],
+                                    url: "/surface.html", // 请求地址
+                                    data: {name: 'hello'}, // 附加参数
+                                    method: "POST", // 请求方式
+                                },
+                            }
+                        }
+                    ],
+                },
+                {
+                    props: {
+                        prop: "handle",
+                        label: "操作",
+                        fixed: "right",
+                    },
+                    scopedSlots: [
+                        {
+                            el: 's-button',
+                            on: {
+                                confirm(e) {
+                                    console.log('confirm')
+                                    e.hideDialog()
+                                },
+                                cancel(e) {
+                                    console.log('cancel')
+                                },
+                                open(e) {
+                                    console.log(this)
+                                    window.hideDialog = e.hideDialog
+                                }
+                            },
+                            props: {
+                                prop: {
+                                    props: {
+                                        type: 'text',
+                                        icon: 'el-icon-s-tools',
+                                        style: {
+                                            color: '#606266'
+                                        }
+                                    }
+                                },
+                                handler: 'page',
+                                tooltip: '编辑',
+                                url: '/surface/form.html',
+                                data: ['id'],
+                                // confirmBtn:{
+                                //     on:{
+                                //         click(){
+                                //             this.hideDialog()
+                                //         }
+                                //     },
+                                //     children: "提交"
+                                // },
+                                confirmBtn: false,
+                                cancelBtn: false
+                            }
+                        },
+                        {
+                            el: 's-button',
+                            on: {
+                                confirm() {
+                                    console.log('confirm')
+                                },
+                                cancel() {
+                                    console.log('cancel')
+                                }
+                            },
+                            props: {
+                                prop: {
+                                    type: 'text',
+                                    icon: 'el-icon-delete-solid',
+                                    style: {
+                                        color: '#606266'
+                                    }
+                                },
+                                cancelBtn: false,
+                                // async:{
+                                //     extends: ['id'],
+                                //     url: "/surface.html",
+                                //     data: {name: 'hello'},
+                                //     method: "POST",
+                                // },
+                                handler: 'confirm',
+                                tooltip: '删除',
+                                confirmMsg: '确认删除吗？'
+                            }
+                        }
+                    ],
+                }
+            ]
+        }
+
+        let st = surfaceTable.create(document.getElementById('surfaceTable'), data)
+
+    }())
+
+</script>
+
+
+</body>
+</html>
