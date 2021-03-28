@@ -498,6 +498,15 @@
                                         console.error('字段[' + this.prop + '] visible 参数错误' + e.message)
                                     }
                                 }
+                            } else if (undefined !== visible.exec){
+                                let that = this
+                                return this.checkVisible(function (model) {
+                                    try {
+                                        return eval(visible.exec)
+                                    } catch (e) {
+                                        console.error('字段[' + that.prop + '] visible 参数错误' + e.message)
+                                    }
+                                })
                             }
                         } else if (isFunction(visible)) {
                             return visible.call(this, this.model)
