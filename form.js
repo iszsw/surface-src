@@ -1587,11 +1587,11 @@
     }()
 
     const ARRAY_COMPONENT = function () {
-        let rowDefault = function (border = true) {
+        let rowDefault = function (border = true, title = false) {
             return {
                 el: 'el-row',
                 style: {
-                    padding: '10px 30px 10px 10px',
+                    padding: title ? '0px 30px 0px 10px' : '10px 30px 10px 10px',
                     border: border ? '1px dashed #d9d9d9' : '0',
                     marginBottom: '10px'
                 },
@@ -1707,7 +1707,7 @@
                         }, [])
 
                         if (this.title) {
-                            children.unshift(extend(rowDefault(this.colSpan === 24), {
+                            children.unshift(extend(rowDefault(this.colSpan === 24, true), {
                                 el: 'el-row',
                                 children: this.options.reduce((options, o) => {
                                     options.push(extend(colDefault(this.colSpan), {children: [o.label]}))
@@ -1717,7 +1717,7 @@
                         }
 
                         if (this.append) {
-                            children.push(extend(rowDefault(null), {
+                            children.push(extend(rowDefault(false), {
                                 el: 'el-row',
                                 children: [
                                     extend(colDefault(this.colSpan), {
@@ -1935,7 +1935,7 @@
                                 if (model.hasOwnProperty(column.prop)) {
                                     column.value = model[column.prop]
                                 }else{
-                                    $set(model, column.prop, column.value || '')
+                                    $set(model, column.prop, column.hasOwnProperty('value') ? column.value : '')
                                 }
                             }
 
