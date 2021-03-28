@@ -175,6 +175,11 @@
         }
     }
 
+    let uuidKey = 1
+    function uuid() {
+        return uuidKey++ + ''
+    }
+
     const _axios = function () {
         let _axios = typeof window !== 'undefined' && window.axios ? window.axios : axios;
         if (undefined === _axios) {
@@ -713,7 +718,7 @@
                 name: RADIO_NAME,
                 events: {
                     onInit(c) {
-                        let options = [], group = !(c.props && c.props.group === false)
+                        let options = [], group = !(c.props && c.props.group === false), name = c.prop + uuid()
                         if (c.options) {
                             for (let op in c.options) {
                                 if (group) {
@@ -721,7 +726,7 @@
                                         el: 'el-radio-button',
                                         props: {
                                             label: op,
-                                            name: c.prop
+                                            name: name
                                         },
                                         children: [c.options[op]]
                                     })
@@ -731,7 +736,7 @@
                                         props: {
                                             value: op,
                                             label: op,
-                                            name: c.prop,
+                                            name: name,
                                         },
                                         children: [c.options[op]]
                                     })
@@ -752,7 +757,7 @@
                 name: CHECKBOX_NAME,
                 events: {
                     onInit(c) {
-                        let options = [], group = !(c.props && c.props.group === false)
+                        let options = [], group = !(c.props && c.props.group === false),name = c.prop + uuid()
                         if (c.options) {
                             for (let op in c.options) {
                                 if (group) {
@@ -760,7 +765,7 @@
                                         el: 'el-checkbox-button',
                                         props: {
                                             label: op,
-                                            name: c.prop
+                                            name: name
                                         },
                                         children: [c.options[op]]
                                     })
@@ -770,7 +775,7 @@
                                         props: {
                                             value: op,
                                             label: op,
-                                            name: c.prop,
+                                            name: name,
                                         },
                                         children: [c.options[op]]
                                     })
@@ -1712,7 +1717,7 @@
                         }
 
                         if (this.append) {
-                            children.push(extend(rowDefault(false), {
+                            children.push(extend(rowDefault(null), {
                                 el: 'el-row',
                                 children: [
                                     extend(colDefault(this.colSpan), {
