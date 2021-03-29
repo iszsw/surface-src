@@ -721,7 +721,7 @@
                                     frameBorder: 0
                                 },
                                 style: {
-                                    height: cw <= 800 ? (ch - 200) + "px" : "calc(70vh - 150px)",
+                                    height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
                                     border: "0 none"
                                 }
                             }),
