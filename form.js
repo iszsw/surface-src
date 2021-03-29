@@ -938,7 +938,7 @@
                                                 id: iframeId
                                             },
                                             style: {
-                                                height: cw <= 800 ? (ch - 200) + "px" : "calc(70vh - 150px)",
+                                                height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
                                                 border: "0 none"
                                             }
                                         }),
@@ -1123,7 +1123,7 @@
                                                         id: iframeId
                                                     },
                                                     style: {
-                                                        height: cw <= 800 ? (ch - 200) + "px" : "calc(70vh - 150px)",
+                                                        height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
                                                         border: "0 none"
                                                     }
                                                 },
@@ -1322,7 +1322,7 @@
                                         id: this.frameId
                                     },
                                     style: {
-                                        height: cw <= 800 ? (ch - 200) + "px" : "calc(70vh - 150px)",
+                                        height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
                                         border: "0 none"
                                     }
                                 }),
@@ -1478,7 +1478,7 @@
                                         id: iframeId
                                     },
                                     style: {
-                                        height: cw <= 800 ? (ch - 200) + "px" : "calc(70vh - 150px)",
+                                        height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
                                         border: "0 none"
                                     }
                                 }),
@@ -1591,9 +1591,9 @@
             return {
                 el: 'el-row',
                 style: {
-                    padding: title ? '0px 30px 0px 10px' : '10px 30px 10px 10px',
+                    padding: title || !border ? '0px 30px 5px 10px' : '10px 30px 10px 10px',
                     border: border ? '1px dashed #d9d9d9' : '0',
-                    marginBottom: '10px'
+                    marginBottom: title || !border ? '0' : '10px'
                 },
             }
         }, colDefault = function (span) {
