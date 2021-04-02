@@ -518,7 +518,8 @@
             data() {
                 return {
                     value: '',
-                    original: ''
+                    original: '',
+                    requestData: {},
                 }
             },
             props:{
@@ -535,6 +536,7 @@
             },
             created() {
                 this.reload()
+                this.requestData = deepClone(this.async.data || {})
             },
             watch: {
                 row: {
@@ -561,7 +563,7 @@
                             value: this.value,
                         }
 
-                        let original = this.async.data || {}
+                        let original = this.requestData
                         for (let k in original) {
                             if (isNaN(k)) {
                                 data[k] = original[k]
