@@ -602,6 +602,19 @@
         let cw = document.documentElement.clientWidth
         let ch = document.documentElement.clientHeight
 
+        const defaultBtn = (type = 'text', emit = null) => {
+            return {
+                el: 'elButton',
+                attrs: {type, size: "medium"},
+                style: {marginLeft: "30px"},
+                on: {
+                    click: () => {
+                        emit ? this.$emit(emit, this) : this.hideDialog()
+                    }
+                }
+            }
+        }
+
         return {
             name: NAME,
             props: {
@@ -629,7 +642,7 @@
                 },
                 doneRefresh: { // 页面关闭之后刷新
                     type: Boolean,
-                    default: true
+                    default: false
                 },
 
                 //submit
@@ -668,69 +681,24 @@
                 return {
                     pageVisible: false,
                     iframeBtn: [],
-                    requestUrl: '',
                     pageChildren: [],
                 }
             },
             created(){
                 switch (this.handler) {
                     case 'page':
-                        const defaultBtn = (type = 'text', emit = null) => {
-                            return {
-                                el: 'elButton',
-                                attrs: {type, size: "medium"},
-                                style: {marginLeft: "30px"},
-                                on: {
-                                    click: () => {
-                                        emit ? this.$emit(emit, this) : this.hideDialog()
-                                    }
-                                }
-                            }
-                        }
-
                         if (this.cancelBtn !== false) {
                             let cancelBtn
                             cancelBtn = isObject(this.cancelBtn) ? this.cancelBtn : {children: this.cancelBtn === true ? "取消" : this.cancelBtn}
                             cancelBtn = extend(defaultBtn('text', 'cancel'), cancelBtn)
                             this.iframeBtn.push(new Render(cancelBtn, this).run())
                         }
-
                         if (this.confirmBtn !== false) {
                             let confirmBtn
                             confirmBtn = isObject(this.confirmBtn) ? this.confirmBtn : {children: this.confirmBtn === true ? "确认" : this.confirmBtn}
                             confirmBtn = extend(defaultBtn('primary', 'confirm'), confirmBtn)
                             this.iframeBtn.push(new Render(confirmBtn, this).run())
                         }
-
-                        this.requestUrl = this.url
-                        for (let k in this.data) {
-                            if (isNaN(k)) {
-                                this.requestUrl = updateQueryStringParam(this.requestUrl, k, this.data[k])
-                            } else {
-                                this.requestUrl = updateQueryStringParam(this.requestUrl, this.data[k], this.row[this.data[k]])
-                            }
-                        }
-
-                        const h = this.$createElement
-
-                        this.pageChildren = [
-                            h("iframe", {
-                                attrs: {
-                                    src: this.requestUrl,
-                                    width: "100%",
-                                    frameBorder: 0
-                                },
-                                style: {
-                                    height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
-                                    border: "0 none"
-                                }
-                            }),
-                            h("div", {slot: "title"}, [
-                                h("span", [this.tooltip]),
-                            ]),
-                            this.iframeBtn.length > 0 ? h("span", {slot: "footer"}, this.iframeBtn) : null,
-                        ]
-
                         break;
                 }
             },
@@ -772,12 +740,11 @@
                         }
                         let data = {}
                         data[pk] = select
-                        that.async.data = Object.assign(that.async.data || {}, data)
-                        return request(that.async).then(function (res) {
+                        return request({...that.async, data}).then(function (res) {
                             if (res.code === undefined) return Promise.reject("返回格式错误，格式：{code: 0, data: [{},...] [, count: Number]}");
                             if (res.code !== 0) return Promise.reject(res.msg || "请求错误");
                             that.$message.success(res.msg || '操作成功');
-                            this.doneRefresh && $surface.$api.reloadData()
+                            that.doneRefresh && $surface.$api.reloadData()
                         }).catch(function (err, o) {
                             that.$message.error(err || '请求失败');
                             o !== undefined && console.error(o)
@@ -809,6 +776,7 @@
                                 if (res.code !== 0) return Promise.reject(res.msg || "请求错误");
                                 that.$message.success(res.msg || '操作成功');
                                 then && then(!0)
+                                that.doneRefresh && $surface.$api.reloadData()
                             }).catch(function (err, o) {
                                 that.$message.error(err || '请求失败');
                                 o !== undefined && console.error(o)
@@ -823,6 +791,34 @@
                 },
                 onPage() {
                     this.pageVisible = true
+                },
+                renderPageChildren(h){
+                    let requestUrl = this.url
+                    for (let k in this.data) {
+                        if (isNaN(k)) {
+                            requestUrl = updateQueryStringParam(requestUrl, k, this.data[k])
+                        } else {
+                            requestUrl = updateQueryStringParam(requestUrl, this.data[k], this.row[this.data[k]])
+                        }
+                    }
+
+                    return [
+                        h("iframe", {
+                            attrs: {
+                                src: requestUrl,
+                                width: "100%",
+                                frameBorder: 0
+                            },
+                            style: {
+                                height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
+                                border: "0 none"
+                            }
+                        }),
+                        h("div", {slot: "title"}, [
+                            h("span", [this.tooltip]),
+                        ]),
+                        this.iframeBtn.length > 0 ? h("span", {slot: "footer"}, this.iframeBtn) : null,
+                    ]
                 },
                 render() {
                     switch (this.handler) {
@@ -872,7 +868,9 @@
                         }
                     }, this.dialog)
 
-                    return h("el-dialog", dialogProps, this.pageChildren)
+
+
+                    return h("el-dialog", dialogProps, this.renderPageChildren(h))
                 },
                 hideDialog() {
                     if (this.pageVisible) this.pageVisible = false
