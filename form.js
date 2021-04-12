@@ -1,6 +1,6 @@
 /**
- * surfaceForm
- *
+ * surfaceForm@last
+ * Gitee https://gitee.com/iszsw/surface-src
  * @author zsw zswemail@qq.com
  */
 ;(function (global, factory) {
@@ -35,8 +35,8 @@
     function deepClone(target) {
         return (function deepClone(target) {
             let result;
-            if (isObject(target) || Array.isArray(target)) {
-                if (Array.isArray(target)) {
+            if (isObject(target) || isArray(target)) {
+                if (isArray(target)) {
                     result = [];
                     for (let i in target) {
                         result.push(deepClone(target[i]))
@@ -83,12 +83,12 @@
 
     function extendVm(obj, ext, arrayCover = true) {
         if (isEmpty(obj)) return ext
-        if (Array.isArray(obj) && !arrayCover) {
-            obj.push(...(Array.isArray(ext) ? ext : [ext]))
+        if (isArray(obj) && !arrayCover) {
+            obj.push(...(isArray(ext) ? ext : [ext]))
         } else {
             for (let i in ext) {
                 if (obj.hasOwnProperty(i)) {
-                    if (isObject(ext[i]) || (Array.isArray(ext[i]) && !arrayCover)) {
+                    if (isObject(ext[i]) || (isArray(ext[i]) && !arrayCover)) {
                         extendVm(obj[i], ext[i], arrayCover)
                     } else {
                         obj[i] = ext[i]
@@ -142,10 +142,14 @@
         return arg == false || arg === undefined || arg.length === 0
     }
 
+    function isArray(arg) {
+        return Array.isArray(arg)
+    }
+
     function isObject(arg) {
         return arg != null
             && typeof arg === "object"
-            && Array.isArray(arg) === false
+            && isArray(arg) === false
     }
 
     function $setNx(target, field, value) {
@@ -372,7 +376,7 @@
                 value: function _initChildren(children) {
                     const vm = this.$vm
                     const VNode = vm.$createElement().constructor
-                    if (Array.isArray(children)) {
+                    if (isArray(children)) {
                         children = children.reduce(function (children, c) {
                             isEmpty(c) || children.push(isObject(c) && !(c instanceof VNode) ? new Render({...c}, vm).run() : c)
                             return children
@@ -451,7 +455,7 @@
                     value: {
                         type: [String, Number, Object, Array, Boolean],
                     },
-                    options: [Object, Array],
+                    options: Array,
                     element: {
                         type: Object,
                         default: _ => {}
@@ -486,7 +490,7 @@
                 },
                 methods: {
                     checkVisible(visible) {
-                        if (Array.isArray(visible)) {
+                        if (isArray(visible)) {
                             for (let i = 0; i < visible.length; i++) {
                                 if (!this.checkVisible(visible[i])) return false;
                             }
@@ -602,7 +606,7 @@
                 data() {
                     return {
                         asyncData: {},
-                        params: {},
+                        params: {}
                     }
                 },
                 created() {
@@ -719,26 +723,26 @@
                 events: {
                     onInit(c) {
                         let options = [], group = !(c.props && c.props.group === false), name = c.prop + uuid()
-                        if (c.options) {
-                            for (let op in c.options) {
+                        if (c.options && isArray(c.options)) {
+                            for (let op of c.options) {
                                 if (group) {
                                     options.push({
                                         el: 'el-radio-button',
                                         props: {
-                                            label: op,
+                                            label: op.value,
                                             name: name
                                         },
-                                        children: [c.options[op]]
+                                        children: [op.label]
                                     })
                                 } else {
                                     options.push({
                                         el: 'el-radio',
                                         props: {
-                                            value: op,
-                                            label: op,
+                                            value: op.value,
+                                            label: op.value,
                                             name: name,
                                         },
-                                        children: [c.options[op]]
+                                        children: [op.label]
                                     })
                                 }
                             }
@@ -758,32 +762,32 @@
                 events: {
                     onInit(c) {
                         let options = [], group = !(c.props && c.props.group === false),name = c.prop + uuid()
-                        if (c.options) {
-                            for (let op in c.options) {
+                        if (c.options && isArray(c.options)) {
+                            for (let op of c.options) {
                                 if (group) {
                                     options.push({
                                         el: 'el-checkbox-button',
                                         props: {
-                                            label: op,
+                                            label: op.value,
                                             name: name
                                         },
-                                        children: [c.options[op]]
+                                        children: [op.label]
                                     })
                                 } else {
                                     options.push({
                                         el: 'el-checkbox',
                                         props: {
-                                            value: op,
-                                            label: op,
+                                            value: op.value,
+                                            label: op.value,
                                             name: name,
                                         },
-                                        children: [c.options[op]]
+                                        children: [op.label]
                                     })
                                 }
                             }
                         }
 
-                        if (!Array.isArray(c.value)) c.value = []
+                        if (!isArray(c.value)) c.value = []
 
                         c.children = options
                     }
@@ -799,15 +803,16 @@
                 events: {
                     onInit(c) {
                         let options = []
-                        if (c.options) {
-                            for (let op in c.options) {
+                        if (c.options && isArray(c.options)) {
+                            for (let op of c.options) {
                                 options.push({
                                     el: 'el-option',
                                     props: {
-                                        value: op,
-                                        label: c.options[op]
+                                        key: op.value,
+                                        value: op.value,
+                                        label: op.label
                                     },
-                                    children: [c.options[op]]
+                                    children: [op.label]
                                 })
                             }
                         }
@@ -820,7 +825,7 @@
 
     const UPLOAD_COMPONENT = function () {
         const format = function (url) {
-            if (Array.isArray(url)) {
+            if (isArray(url)) {
                 let data = [];
                 for (let i of url) {
                     data.push({
@@ -832,7 +837,7 @@
                 return [{url: url}]
             }
         }, getUrl = function (list) {
-            if (Array.isArray(list)) {
+            if (isArray(list)) {
                 let data = [];
                 for (let i of list) {
                     data.push(i.url)
@@ -842,7 +847,7 @@
                 return [data.url]
             }
         }
-        let init = false, dialogProps = {}
+        let init = false, uploadProps = {}
 
         const cw = document.documentElement.clientWidth,
             ch = document.documentElement.clientHeight
@@ -856,7 +861,7 @@
                         manageUrl: String,
                         prop: String,
                         data: Object,
-                        value: Array,
+                        value: [Array, String],
                         model: Object,
                         label: {
                             type: String,
@@ -864,13 +869,10 @@
                         },
                         limit: {
                             type: Number,
-                            default: 9
+                            default: 1
                         },
                     },
                     render(h, cxt) {
-                        const cw = document.documentElement.clientWidth,
-                            ch = document.documentElement.clientHeight
-
                         let props = cxt.props,
                             data = cxt.data,
                             prop = props.prop,
@@ -879,18 +881,23 @@
                             iframeId = prop + '_iframe_' + new Date().getTime(),
                             manageNode = null,
                             _vm = $surface.$vm,
-                            limit = props.limit || 9,
-                            value = props.value ? props.value : []
+                            limit = props.limit || 1,
+                            value = (undefined === props.value ? [] : props.value)
+
+                        if(!isArray(value) && limit > 1) {
+                            value = value.toString().length > 0 ? [value] : []
+                        }
+
+                        let only = !isArray(value)
 
                         init || cxt.parent.$nextTick(function(){
-                            init = true
                             let fileList = cxt.parent.$refs[uploadRef].fileList
-                            fileList.push(...format(value))
+                            !isEmpty(value) && fileList.push(...format(value))
                             init = true
                         })
 
                         const changeVisible = function (visible) {
-                            dialogProps[prop].visible = visible
+                            uploadProps[prop].visible = visible
                         }
 
                         if (props.manageUrl) {
@@ -909,7 +916,7 @@
                                     h('i', {class: 'el-icon-folder'}),
                                     h("el-dialog", {
                                         ref: dialogRef,
-                                        props: dialogProps[prop],
+                                        props: uploadProps[prop],
                                         attrs: {
                                             width: cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
                                             fullscreen: cw <= 800,
@@ -974,7 +981,8 @@
                                                         }
 
                                                         fileList.push(...format(selected))
-                                                        cxt.parent.$emit('input', getUrl(fileList))
+                                                        let list = getUrl(fileList)
+                                                        cxt.parent.$emit('input', only ? list[0] : list)
                                                         changeVisible(!1)
                                                     }
                                                 }
@@ -997,12 +1005,13 @@
                                     _vm.$message.error(res.code === undefined ? "返回格式错误，格式：{code: 0, msg: '', data: {url:...}}} " : (res.msg || "上传失败"))
                                 } else {
                                     f.url = res.data.url
-                                    cxt.parent.$emit('input', fl.map(i => i.url))
+                                    let list = fl.map(i => i.url)
+                                    cxt.parent.$emit('input', only ? list[0] : list)
                                 }
                             },
                             onRemove(file, fileList) {
                                 let list = fileList.map(i => i.url)
-                                $surface.$api.change(prop, list)
+                                cxt.parent.$emit('input', only ? '' : list)
                             },
                             onError: (r, f, fl) => {
                                 _vm.$message.error('上传失败, 【 ' + r + ' 】');
@@ -1021,174 +1030,9 @@
                 events:{
                     onInit(c){
                         if (c.prop) {
-                            dialogProps[c.prop] = Vue.observable({visible: false})
-                        }
-                        if (!Array.isArray(c.value)) {
-                            c.value = c.value ? [c.value] : []
+                            uploadProps[c.prop] = Vue.observable({ visible: false })
                         }
                     },
-                    onInita: function (c) {
-                        let props = c.props || {},
-                            prop = c.prop,
-                            dialogRef = prop + '_dialog_' + new Date().getTime(),
-                            iframeId = prop + '_iframe_' + new Date().getTime(),
-                            uploadRef = c.ref ? c.ref : prop + '_upload_' + new Date().getTime(),
-                            value = c.value ? Array.isArray(c.value) ? c.value : [c.value] : []
-
-                        extendVm(c, {
-                            ref: uploadRef,
-                            prop: undefined, // 自行处理v-model
-                            props: {
-                                'list-type': 'picture-card',
-                                limit: props.limit || 9,
-                                fileList: format(value),
-                                onRemove(file, fileList){
-                                    c.props.fileList = fileList
-                                    let list = fileList.map(i => i.url)
-                                    $surface.$api.change(prop, list)
-                                },
-                                onSuccess(res, f, fl) {
-                                    if (res.code === undefined) {
-                                        fl.pop()
-                                        return $surface.$vm.$message.error("返回格式错误，格式：{code: 0, msg: '', data: {url: '...'}} ")
-                                    }
-                                    if (res.code !== 0) {
-                                        fl.pop()
-                                        return $surface.$vm.$message.error(res.msg || "上传失败");
-                                    }
-                                    f.url = res.data.url
-                                    c.props.fileList = fl
-                                    $surface.$api.change(prop, fl)
-                                },
-                                onError(r, f, fl) {
-                                    $surface.$vm.$message.error('上传失败, 【 ' + r + ' 】');
-                                },
-                                onExceed(files, fileList) {
-                                    $surface.$vm.$message.error("最多上传 " + c.props.maxLength + "个文件");
-                                }
-                            }
-                        })
-
-                        c.children = c.children || []
-                        c.children.push({el: 'i', class: 'el-icon-plus avatar-uploader-icon'})
-
-                        if (props.manageUrl) {
-                            c.children.push({
-                                    el: 'div',
-                                    slot: "tip",
-                                    class: "el-upload el-upload--picture-card",
-                                    on: {
-                                        click(event){
-                                            event.stopPropagation()
-                                            this.$refs[dialogRef].visible = true
-                                        }
-                                    },
-                                    children: [
-                                        {
-                                            el: 'i',
-                                            class: 'el-icon-folder',
-                                        },
-                                        {
-                                            el: 'el-dialog',
-                                            ref: dialogRef,
-                                            props: {
-                                                visible: false,
-                                            },
-                                            attrs: {
-                                                width: cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
-                                                fullscreen: cw <= 800,
-                                                "append-to-body": true,
-                                                'destroy-on-close': false,
-                                                'close-on-press-escape': true,
-                                                'close-on-click-modal': true,
-                                                'show-close': true,
-                                            },
-                                            on: {
-                                                open() {
-                                                    $surface.$api.setHideDialog(() => {
-                                                        this.$refs[dialogRef].visible = false
-                                                    })
-                                                },
-                                                close()  {
-                                                    this.$refs[dialogRef].visible = false
-                                                },
-                                            },
-                                            children: [
-                                                {
-                                                    el: 'iframe',
-                                                    attrs: {
-                                                        src: props.manageUrl,
-                                                        width: "100%",
-                                                        frameBorder: 0,
-                                                        id: iframeId
-                                                    },
-                                                    style: {
-                                                        height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
-                                                        border: "0 none"
-                                                    }
-                                                },
-                                                {
-                                                    el: 'div',
-                                                    slot: "title",
-                                                    children: [
-                                                        {
-                                                            el: 'span',
-                                                            children: [c.label],
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    el: 'div',
-                                                    slot: "footer",
-                                                    children: [
-                                                        {
-                                                            el: 'elButton',
-                                                            attrs: {type: 'text', size: "medium"},
-                                                            style: {marginLeft: "30px"},
-                                                            on: {
-                                                                click() {
-                                                                    this.$refs[dialogRef].visible = false
-                                                                }
-                                                            },
-                                                            children: ['取消']
-                                                        },
-                                                        {
-                                                            el: 'elButton',
-                                                            attrs: {type: 'primary', size: "medium"},
-                                                            style: {marginLeft: "30px"},
-                                                            on: {
-                                                                click(){
-                                                                    const iframe = document.getElementById(iframeId).contentWindow
-                                                                    let selected = iframe.surface_selection
-                                                                    if (undefined === selected) {
-                                                                        $surface.$vm.$message.error('子页面缺少变量 [surface_selection]')
-                                                                        return false
-                                                                    }
-                                                                    if (selected.length > 0) {
-                                                                        selected = format(selected)
-                                                                        let files = this.$refs[uploadRef].fileList
-                                                                        if (props.limit < selected.length + files.length) {
-                                                                            $surface.$vm.$message.error('最多选择 ' + props.limit + ' 个文件')
-                                                                            return false
-                                                                        }
-                                                                        let fileList = [...files, ...selected]
-                                                                        c.props.fileList = fileList
-                                                                        $surface.$api.change(prop, fileList.map(i => i.url))
-                                                                    }
-                                                                    this.$refs[dialogRef].visible = false
-                                                                }
-                                                            },
-                                                            children: ['确认']
-                                                        },
-                                                    ]
-                                                },
-                                            ]
-                                        },
-                                    ]
-                                }
-                            )
-                        }
-                    }
                 }
             }
         }
@@ -1378,7 +1222,7 @@
                         let separator = c.props.separator || '/',
                             props = c.props
 
-                        if (!Array.isArray(c.value)) {
+                        if (!isArray(c.value)) {
                             c.value = c.value.split(separator)
                         }
 
@@ -1423,25 +1267,94 @@
             return {
                 name: TAKE_NAME,
                 component: {
+                    props: {
+                        prop: String,
+                        label: String,
+                        url: String,
+                        limit: {
+                            type: Number,
+                            default: 1
+                        },
+                        value: {
+                            type: [Array, String, Number]
+                        },
+                        options: {
+                            type: Array,
+                            default() {
+                                return []
+                            }
+                        },
+                    },
+                    created(){
+                        let optionData = deepClone(this.options)
+                        for (let op of optionData) {
+                            if (
+                                (!isArray(this.value) && this.value === op.value) ||
+                                (isArray(this.value) && this.value.indexOf(op.value) >= 0)
+                            ) {
+                                this.optionData.push(op)
+                            }
+                        }
+                        if(!isArray(this.value) && this.limit > 1) {
+                            this.$emit('input', this.value.toString().length > 0 ? [this.value] : [])
+                        }else if(!isArray(this.value)) {
+                            this.only = true
+                        }
+
+                    },
+                    data() {
+                        return {
+                            dialogShow: false,
+                            optionData: [],
+                            only: false
+                        }
+                    },
+                    methods: {
+                        remove(i) {
+                            let val = this.optionData[i].value
+                            this.optionData.splice(i, 1)
+                            let values = deepClone(this.value)
+                            if (this.only) {
+                                values = ''
+                            }else{
+                                values.splice(values.indexOf(val), 1)
+                            }
+                            this.$emit('input', values)
+                        },
+                        append(option) {
+                            let values = deepClone(this.value)
+                            for (let op of option) {
+                                this.optionData.push(op)
+                                if (this.only) {
+                                    values = op.value
+                                }else{
+                                    values.push(op.value)
+                                }
+                            }
+                            this.$emit('input', values)
+                        }
+                    },
                     render(h) {
                         const iframeId = this.prop + '_iframe_' + new Date().getTime()
 
-                        return h('div', {}, [
-                            this.options.map((v) => {
-                                return this.value.indexOf(v.value) < 0 ? null : h('div', {class: 'c-take-box'}, [
-                                    h('i', {
-                                        class: 'el-icon-close c-take-delete', on: {
-                                            click: () => {
-                                                this.remove(v)
-                                            }
+                        let c = []
+                        this.optionData.forEach((op, i) =>{
+                            c.push(h('div', {class: 'c-take-box'}, [
+                                h('i', {
+                                    class: 'el-icon-close c-take-delete', on: {
+                                        click: () => {
+                                            this.remove(i)
                                         }
-                                    }),
-                                    h('span', {
-                                        domProps: {innerHTML: v.label},
-                                        class: 'c-take-content'
-                                    })
-                                ])
-                            }),
+                                    }
+                                }),
+                                h('span', {
+                                    domProps: {innerHTML: op.label},
+                                    class: 'c-take-content'
+                                })
+                            ]))
+                        })
+
+                        return h('div', {}, [c,
                             h('el-button', {
                                 class: 'el-icon-plus c-take-add',
                                 props: {circle: true, size: 'mini'},
@@ -1510,21 +1423,28 @@
                                                         selected.forEach(row => {
                                                             let value = row[pk]
                                                             selection.push({
-                                                                value: value,
-                                                                label: row._selection || value
+                                                                value, label: row._selection || value
                                                             })
                                                         })
                                                     }
                                                 } else {
+                                                    // 格式 surface_selection = [{label: '', value: ''}, ...]
                                                     selection = iframe.surface_selection
                                                 }
 
                                                 if (undefined === selection) {
                                                     this.$message.error('子页面缺少变量 [surface_selection]')
-                                                    return false
+                                                    return false;
                                                 }
 
-                                                if (this.limit < selection.length + this.value.length) {
+                                                if (selection.length === 0) {
+                                                    return;
+                                                }
+
+                                                if (
+                                                    (this.only && (selection.length > 1 || this.value !== '')) ||
+                                                    (this.limit < selection.length + this.value.length)
+                                                ) {
                                                     this.$message.error('最多选择 ' + this.limit + ' 个文件')
                                                     return false
                                                 }
@@ -1538,48 +1458,10 @@
                             ])
                         ])
                     },
-                    data() {
-                        return {
-                            dialogShow: false,
-                        }
-                    },
-                    props: {
-                        prop: String,
-                        label: String,
-                        url: String,
-                        unique: {
-                            type: Boolean,
-                            default: true
-                        },
-                        limit: {
-                            type: Number,
-                            default: 9
-                        },
-                        value: {
-                            type: Array,
-                            default() {
-                                return []
-                            }
-                        },
-                        options: Array,
-                    },
-                    methods: {
-                        remove(option) {
-                            this.value.splice(this.value.indexOf(option.value), 1)
-                            this.$emit('input', this.value)
-                        },
-                        append(option) {
-                            let values = deepClone(this.value)
-                            option.forEach(v => {values.push(v.value)})
-                            this.$emit('input', values)
-                            this.options.push(...option)
-                            return option
-                        }
-                    },
                 },
                 events: {
                     onInit(c) {
-                        c.value = Array.isArray(c.value) ? c.value : c.value ? [c.value] : []
+                        // c.value = isArray(c.value) ? c.value : c.value ? [c.value] : []
                     }
                 }
             }
@@ -1706,7 +1588,7 @@
                             return columns
                         }, [])
 
-                        if (this.title) {
+                        if (this.title && this.value.length > 0) {
                             children.unshift(extend(rowDefault(this.colSpan === 24, true), {
                                 el: 'el-row',
                                 children: this.options.reduce((options, o) => {
@@ -1742,7 +1624,7 @@
                 },
                 events: {
                     onInit: function (c) {
-                        if (!Array.isArray(c.value)) {
+                        if (!isArray(c.value)) {
                             c.value = []
                         }
                     }
@@ -1757,7 +1639,7 @@
                 name: TREE_NAME,
                 events: {
                     onInit: function (c) {
-                        if (!Array.isArray(c.value)) c.value = c.value ? [c.value] : [];
+                        if (!isArray(c.value)) c.value = c.value ? [c.value] : [];
                         if (c.props['show-checkbox'] || c.props['showCheckbox']) {
                             if (c.props && !c.props['node-key']) {
                                 c.props['node-key'] = 'id'
@@ -1804,9 +1686,9 @@
                     },
                     components: componentsInit([FORM_COMPONENT]),
                     beforeCreate: function beforeCreate() {
-                        const vm$props = this.$options.propsData
                         this.surfaceForm = new SurfaceForm();
                         this.surfaceForm.beforeCreate(this);
+                        const vm$props = this.$options.propsData
                         this.surfaceForm.createForm(vm$props.columns, vm$props.options)
                         $surface = this.surfaceForm
                     },
@@ -1844,13 +1726,7 @@
                             confirmMsg: '',
                         }
                     },
-                    resetBtn: {
-                        props: {
-                            prop: {
-                                icon: 'el-icon-refresh'
-                            },
-                        }
-                    },
+                    resetBtn: false,
                     props: {
                         'label-width': "100px",
                         model: {}
@@ -1859,9 +1735,7 @@
             }
 
             function _create(options) {
-
                 extendVm(config, options)
-
                 let $vm = new Vue({
                     data: function data() {
                         return config;
@@ -1915,7 +1789,7 @@
                 {
                     key: "_initColumns",
                     value: function _initColumns(column, model) {
-                        if (Array.isArray(column)) {
+                        if (isArray(column)) {
                             column.forEach((v, k) => {
                                 $set(column, k, this._initColumns(v, model))
                             })
@@ -2032,7 +1906,7 @@
                 }, {
                     key: "component",
                     value: function component(component) {
-                        if (Array.isArray(component)) {
+                        if (isArray(component)) {
                             component.map(SurfaceForm.component)
                         } else {
                             if (isFunction(component)) {
@@ -2047,7 +1921,7 @@
                                     if (!events[component.name].hasOwnProperty(e)) {
                                         events[component.name][e] = []
                                     }
-                                    Array.isArray(component.events[e]) ?
+                                    isArray(component.events[e]) ?
                                         events[component.name][e].concat(component.events[e]) :
                                         events[component.name][e].push(component.events[e])
 
