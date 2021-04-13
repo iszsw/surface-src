@@ -1555,7 +1555,12 @@
                         let children = this.value.reduce((columns, v, i) => {
                             let val = {},
                                 rowChildren = deepClone(this.options).reduce((options, o) => {
-                                    o.value = v[o.prop] || o.value || '';
+                                    o.value = '';
+                                    if(v.hasOwnProperty(o.prop)) {
+                                        o.value = v[o.prop]
+                                    }else if (o.hasOwnProperty('value')){
+                                        o.value = o.value
+                                    }
                                     let c = $surface._initColumns(o, val)
 
                                     const input = value => this.input(i, o.prop, value)
@@ -1564,7 +1569,6 @@
                                     }else{
                                         c.on.input = input
                                     }
-
                                     options.push(extend(colDefault(this.colSpan), {children: [c]}))
                                     return options
                                 }, [])
