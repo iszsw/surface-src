@@ -709,6 +709,9 @@
                     return new Render({
                         el: 'elForm',
                         children: [...this.columns, btnColumn],
+                        nativeOn:{
+                            submit: event => event.preventDefault() // 阻止回车键提交
+                        },
                         ...this.element
                     }, this).run()
                 }
