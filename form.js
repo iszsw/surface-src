@@ -830,10 +830,14 @@
         const format = function (url) {
             if (isArray(url)) {
                 let data = [];
+                let i = 1
                 for (let i of url) {
                     data.push({
-                        url: i
+                        url: i,
+                        uid: new Date().getTime() + i,
+                        status: 'success'
                     })
+                    i++
                 }
                 return data
             } else {
@@ -850,10 +854,12 @@
                 return [data.url]
             }
         }
-        let init = false, uploadProps = {}
+        let uploadProps = {}
 
         const cw = document.documentElement.clientWidth,
             ch = document.documentElement.clientHeight
+
+        let uploadVm, dialogVisible = false
 
         return function () {
             return {
@@ -873,134 +879,146 @@
                         limit: {
                             type: Number,
                             default: 1
-                        },
+                        }
                     },
                     render(h, cxt) {
                         let props = cxt.props,
                             data = cxt.data,
                             prop = props.prop,
-                            uploadRef = data.ref ? data.ref : prop + '_upload_' + new Date().getTime(),
-                            dialogRef = prop + '_dialog_' + new Date().getTime(),
-                            iframeId = prop + '_iframe_' + new Date().getTime(),
-                            manageNode = null,
+                            uploadRef = data.ref ? data.ref : prop + '_upload',
+                            dialogRef = prop + '_dialog',
+                            iframeId = prop + '_iframe',
                             _vm = $surface.$vm,
                             limit = props.limit || 1,
-                            value = (undefined === props.value ? [] : props.value)
+                            value = (undefined === props.value ? [] : props.value),
+                            fileList = [],
+                            hasManage = !!props.manageUrl,
+                            manageVm = null,
+                            dialogVm = null
 
                         if(!isArray(value) && limit > 1) {
                             value = value.toString().length > 0 ? [value] : []
                         }
 
-                        let only = !isArray(value)
-
-                        init || cxt.parent.$nextTick(function(){
-                            let fileList = cxt.parent.$refs[uploadRef].fileList
-                            !isEmpty(value) && fileList.push(...format(value))
-                            init = true
-                        })
-
-                        const changeVisible = function (visible) {
-                            uploadProps[prop].visible = visible
+                        function changeDialog( visible, handle = true ){
+                            dialogVisible = visible
+                            if (handle) {
+                                let list = getUrl(cxt.parent.$refs[uploadRef].uploadFiles)
+                                cxt.parent.$emit('input', only ? list[0] : list)
+                            }
                         }
 
-                        if (props.manageUrl) {
-                            manageNode = h('div',
+                        let only = !isArray(value)
+
+                        if (hasManage) {
+                            dialogVm = h("el-dialog", {
+                                ref: dialogRef,
+                                props: {
+                                    visible: dialogVisible
+                                },
+                                attrs: {
+                                    width: cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
+                                    fullscreen: cw <= 800,
+                                    "append-to-body": true,
+                                    'destroy-on-close': false,
+                                    'close-on-press-escape': true,
+                                    'close-on-click-modal': true,
+                                    'show-close': true,
+                                },
+                                on: {
+                                    open: () => {
+                                        $surface.$api.setHideDialog(() => {
+                                            changeDialog(false)
+                                        })
+                                    },
+                                    close: () => {
+                                        changeDialog(false)
+                                    },
+                                }
+                            }, [
+                                h("iframe", {
+                                    attrs: {
+                                        src: props.manageUrl,
+                                        width: "100%",
+                                        frameBorder: 0,
+                                        id: iframeId
+                                    },
+                                    style: {
+                                        height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
+                                        border: "0 none"
+                                    }
+                                }),
+                                h("div", {slot: "title"}, [
+                                    h("span", [props.label]),
+                                ]),
+                                h("div", {slot: "footer"}, [
+                                    h('elButton', {
+                                        attrs: {type: 'text', size: "medium"},
+                                        style: {marginLeft: "30px"},
+                                        on: {
+                                            click: () => {
+                                                changeDialog(false)
+                                            }
+                                        }
+                                    }, ['取消']),
+                                    h('elButton', {
+                                        attrs: {type: 'primary', size: "medium"},
+                                        style: {marginLeft: "30px"},
+                                        on: {
+                                            click() {
+                                                const iframe = document.getElementById(iframeId).contentWindow
+                                                let selected = iframe.surface_selection
+                                                if (undefined === selected) {
+                                                    _vm.$message.error('子页面缺少变量 [surface_selection]')
+                                                    return false
+                                                }
+                                                let fileList = cxt.parent.$refs[uploadRef].uploadFiles
+                                                if (props.limit < selected.length + fileList.length) {
+                                                    _vm.$message.error('最多选择 ' + props.limit + ' 个文件，还能选择 '+(props.limit - fileList.length)+' 个')
+                                                    return false
+                                                }
+
+                                                fileList.push(...format(selected))
+                                                let list = getUrl(fileList)
+                                                changeDialog(false, false)
+                                                cxt.parent.$emit('input', only ? list[0] : list)
+                                            }
+                                        }
+                                    }, ['确认']),
+                                ]),
+                            ])
+                        }
+
+                        if (uploadVm) {
+                            return h('div', null, [uploadVm, dialogVm])
+                        }
+
+                        if (hasManage) {
+                            manageVm = h('div',
                                 {
                                     slot: "tip",
                                     class: "el-upload el-upload--picture-card",
                                     on: {
                                         click: (event) => {
                                             event.stopPropagation()
-                                            changeVisible(!0)
+                                            changeDialog(true)
                                         }
                                     }
                                 },
                                 [
-                                    h('i', {class: 'el-icon-folder'}),
-                                    h("el-dialog", {
-                                        ref: dialogRef,
-                                        props: uploadProps[prop],
-                                        attrs: {
-                                            width: cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
-                                            fullscreen: cw <= 800,
-                                            "append-to-body": true,
-                                            'destroy-on-close': false,
-                                            'close-on-press-escape': true,
-                                            'close-on-click-modal': true,
-                                            'show-close': true,
-                                        },
-                                        on: {
-                                            open: () => {
-                                                $surface.$api.setHideDialog(() => {
-                                                    changeVisible(!1)
-                                                })
-                                            },
-                                            close: () => {
-                                                changeVisible(!1)
-                                            },
-                                        }
-                                    }, [
-                                        h("iframe", {
-                                            attrs: {
-                                                src: props.manageUrl,
-                                                width: "100%",
-                                                frameBorder: 0,
-                                                id: iframeId
-                                            },
-                                            style: {
-                                                height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
-                                                border: "0 none"
-                                            }
-                                        }),
-                                        h("div", {slot: "title"}, [
-                                            h("span", [props.label]),
-                                        ]),
-                                        h("div", {slot: "footer"}, [
-                                            h('elButton', {
-                                                attrs: {type: 'text', size: "medium"},
-                                                style: {marginLeft: "30px"},
-                                                on: {
-                                                    click: () => {
-                                                        changeVisible(!1)
-                                                    }
-                                                }
-                                            }, ['取消']),
-                                            h('elButton', {
-                                                attrs: {type: 'primary', size: "medium"},
-                                                style: {marginLeft: "30px"},
-                                                on: {
-                                                    click() {
-                                                        const iframe = document.getElementById(iframeId).contentWindow
-                                                        let selected = iframe.surface_selection
-                                                        if (undefined === selected) {
-                                                            _vm.$message.error('子页面缺少变量 [surface_selection]')
-                                                            return false
-                                                        }
-
-                                                        let fileList = cxt.parent.$refs[uploadRef].fileList
-                                                        if (props.limit < selected.length + fileList.length) {
-                                                            _vm.$message.error('最多选择 ' + props.limit + ' 个文件')
-                                                            return false
-                                                        }
-
-                                                        fileList.push(...format(selected))
-                                                        let list = getUrl(fileList)
-                                                        cxt.parent.$emit('input', only ? list[0] : list)
-                                                        changeVisible(!1)
-                                                    }
-                                                }
-                                            }, ['确认']),
-                                        ]),
-                                    ])
+                                    h('i', {class: 'el-icon-folder'})
                                 ]
                             )
                         }
+
+                        value && fileList.push(...format(value))
 
                         let attrs = extend(data, {ref: uploadRef})
                         attrs.props = Object.assign(attrs.props, {
                             'list-type': 'picture-card',
                             multiple: limit > 1,
-                            limit: limit,
+                            limit,
+                            fileList,
                             onSuccess: (res, f, fl) => {
                                 if (res.code === undefined || res.code !== 0) {
                                     f.status = 'error'
@@ -1024,18 +1042,12 @@
                             }
                         })
 
-                        return h('el-upload', attrs, [
+                        uploadVm = h('el-upload', attrs, [
                             h('i', {class: 'el-icon-plus avatar-uploader-icon'}),
-                            manageNode
+                            manageVm
                         ])
+                        return h('div', null, [uploadVm, dialogVm])
                     }
-                },
-                events:{
-                    onInit(c){
-                        if (c.prop) {
-                            uploadProps[c.prop] = Vue.observable({ visible: false })
-                        }
-                    },
                 }
             }
         }
