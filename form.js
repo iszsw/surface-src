@@ -826,6 +826,12 @@
         }
     }()
 
+    const cw = document.documentElement.clientWidth,
+        ch = document.documentElement.clientHeight,
+        fullscreen = cw < 850,
+        dialogW = cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
+        iframeH = fullscreen ? (ch - 131) + "px" : "calc(80vh - 150px)"
+
     const UPLOAD_COMPONENT = function () {
         const format = function (url) {
             if (isArray(url)) {
@@ -854,9 +860,6 @@
                 return [data.url]
             }
         }
-
-        const cw = document.documentElement.clientWidth,
-            ch = document.documentElement.clientHeight
 
         let uploadVm, dialogVisible = false
 
@@ -916,8 +919,8 @@
                                     visible: dialogVisible
                                 },
                                 attrs: {
-                                    width: cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
-                                    fullscreen: cw <= 800,
+                                    width: dialogW,
+                                    fullscreen: fullscreen,
                                     "append-to-body": true,
                                     'destroy-on-close': false,
                                     'close-on-press-escape': true,
@@ -943,7 +946,7 @@
                                         id: iframeId
                                     },
                                     style: {
-                                        height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
+                                        height: iframeH,
                                         border: "0 none"
                                     }
                                 }),
@@ -1158,8 +1161,8 @@
                                     visible: this.dialogShow,
                                 },
                                 attrs: {
-                                    width: cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
-                                    fullscreen: cw <= 800,
+                                    width: dialogW,
+                                    fullscreen: fullscreen,
                                     "append-to-body": true,
                                     'destroy-on-close': false,
                                     'close-on-press-escape': true,
@@ -1180,7 +1183,7 @@
                                         id: this.frameId
                                     },
                                     style: {
-                                        height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
+                                        height: iframeH,
                                         border: "0 none"
                                     }
                                 }),
@@ -1383,8 +1386,8 @@
                                     visible: this.dialogShow,
                                 },
                                 attrs: {
-                                    width: cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
-                                    fullscreen: cw <= 800,
+                                    width: dialogW,
+                                    fullscreen: fullscreen,
                                     "append-to-body": true,
                                     'destroy-on-close': false,
                                     'close-on-press-escape': true,
@@ -1405,7 +1408,7 @@
                                         id: iframeId
                                     },
                                     style: {
-                                        height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
+                                        height: iframeH,
                                         border: "0 none"
                                     }
                                 }),
