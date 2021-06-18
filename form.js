@@ -854,7 +854,6 @@
                 return [data.url]
             }
         }
-        let uploadProps = {}
 
         const cw = document.documentElement.clientWidth,
             ch = document.documentElement.clientHeight
@@ -879,7 +878,8 @@
                         limit: {
                             type: Number,
                             default: 1
-                        }
+                        },
+                        uuid: Number
                     },
                     render(h, cxt) {
                         let props = cxt.props,
@@ -900,15 +900,14 @@
                             value = value.toString().length > 0 ? [value] : []
                         }
 
-                        function changeDialog( visible, handle = true ){
+                        let only = !isArray(value)
+
+                        function changeDialog( visible, refresh = true ){
                             dialogVisible = visible
-                            if (handle) {
-                                let list = getUrl(cxt.parent.$refs[uploadRef].uploadFiles)
-                                cxt.parent.$emit('input', only ? list[0] : list)
+                            if (refresh) {
+                                cxt.parent.$emit('_refresh')
                             }
                         }
-
-                        let only = !isArray(value)
 
                         if (hasManage) {
                             dialogVm = h("el-dialog", {
@@ -1854,6 +1853,11 @@
                                 this.$api.change(column.prop, val)
                                 props.element.props.value = val
                             }
+
+                            const _refresh = () => {
+                                props.element.props.uuid++
+                            }
+
                             column.el = COMPONENT_NAME_ALIAS.hasOwnProperty(column.el) ? COMPONENT_NAME_ALIAS[column.el] : column.el
                             if (!isEmpty(column.prop)) {
                                 $set(column.props, 'model', model)
@@ -1862,17 +1866,19 @@
                                     $set(column, 'on', {})
                                 }
                                 column.on.input = input
+                                column.on._refresh = _refresh
                                 extendVm(column.props, {
                                     prop: column.prop,
                                     label: column.label,
-                                    value: model[column.prop]
+                                    value: model[column.prop],
+                                    uuid: 1,
                                 })
                             }
 
                             column.props.options = column.options || []
                             return false === column.item ? column : {
                                 el: FORM_ITEM_NAME,
-                                on:{input},
+                                on:{input, _refresh},
                                 props: {
                                     ...props = CE(column, 'element'),
                                     model
