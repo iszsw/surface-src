@@ -1074,6 +1074,7 @@
                         manageUrl: String,
                         typeName: {type: String, default: 'type'},
                         value: {type: String, required: true},
+                        uploadFileName: {type: String, default: 'file'},
                     },
                     data: () => ({
                         id: '',
@@ -1101,6 +1102,7 @@
                             if (this.uploadUrl === undefined) {
                                 config.uploadImgShowBase64 = true
                             } else {
+                                config.uploadFileName = this.uploadFileName
                                 config.uploadImgServer = updateQueryStringParam(this.uploadUrl, this.typeName, 'image')
                                 config.uploadVideoServer = updateQueryStringParam(this.uploadUrl, this.typeName, 'video')
                                 config.uploadImgHooks = {
