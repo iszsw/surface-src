@@ -598,11 +598,14 @@
         }
     }()
 
+    let cw = document.documentElement.clientWidth,
+        ch = document.documentElement.clientHeight,
+        fullscreen = cw < 950, // table 组件子页面大于 Form
+        dialogW = cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
+        iframeH = fullscreen ? (ch - 81) + "px" : "calc(80vh - 150px)"
+
     const buttonComponent = function () {
         const NAME = "s-button"
-
-        let cw = document.documentElement.clientWidth
-        let ch = document.documentElement.clientHeight
 
         const defaultBtn = (type = 'text', emit = null) => {
             return {
@@ -812,7 +815,7 @@
                                 frameBorder: 0
                             },
                             style: {
-                                height: cw <= 800 ? (ch - 80) + "px" : "calc(80vh - 150px)",
+                                height: iframeH,
                                 border: "0 none"
                             }
                         }),
@@ -841,8 +844,8 @@
                             visible: this.pageVisible,
                         },
                         attrs: {
-                            width: cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
-                            fullscreen: cw <= 800,
+                            width: dialogW,
+                            fullscreen: fullscreen,
                             "append-to-body": true,
                             'destroy-on-close': false,
                             'close-on-press-escape': true,
@@ -1201,7 +1204,7 @@
                                     case 'float':
                                         _val = parseFloat(value)
                                         break;
-                                    case 'Boolean':
+                                    case 'boolean':
                                         _val = !!value
                                         break;
                                     case 'string':
