@@ -1468,7 +1468,12 @@
         }()
     }
 
-    const css = "body{padding: 15px;background-color: #FFFFFF}.el-pagination{padding: 30px !important;text-align: center}.col-editable{border-bottom:1px dashed #333;}.el-table__fixed-right::before, .el-table__fixed::before{z-index:0 !important}.el-dialog__body{padding:20px 10px 0px}"
+    // 自定义样式
+    let css = "body{padding: 15px;background-color: #FFFFFF}.el-pagination{padding: 30px !important;text-align: center}.col-editable{border-bottom:1px dashed #333;}.el-table__fixed-right::before, .el-table__fixed::before{z-index:0 !important}.el-dialog__body{padding:20px 10px 0px}"
+
+    // 覆盖Element样式
+    css += ".el-table thead{color: #333333}"
+
     styleInject(css);
 
     let $surfaceTable = Creator(),
