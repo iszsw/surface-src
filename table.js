@@ -1469,10 +1469,13 @@
     }
 
     // 自定义样式
-    let css = "body{padding: 15px;background-color: #FFFFFF}.el-pagination{padding: 30px !important;text-align: center}.col-editable{border-bottom:1px dashed #333;}.el-table__fixed-right::before, .el-table__fixed::before{z-index:0 !important}.el-dialog__body{padding:20px 10px 0px}"
+    let css = "body{padding: 15px;background-color: #eff1f7}.col-editable{border-bottom:1px dashed #333;}.el-table__fixed-right::before, .el-table__fixed::before{z-index:0 !important}.el-dialog__body{padding:20px 10px 0px}"
 
-    // 覆盖Element样式
-    css += ".el-table thead{color: #333333}"
+    // table样式
+    css += ".el-table{margin-top: 10px;box-shadow: 0px 0px 5px #D8DADF}.el-table thead th{color: #333333;background-color: #ececf1}.el-button--text{padding: 0}.el-table td, .el-table th{padding:15px 0px}"
+
+    // 分页样式
+    css += ".el-pagination{padding: 30px !important;text-align: center}.el-pagination .el-input__inner {box-shadow: 0px 0px 5px #DCDFE6}.el-pagination button:disabled,.el-pagination .el-pager li,.el-pagination .btn-next, .el-pagination .btn-prev{background-color: transparent}"
 
     styleInject(css);
 
