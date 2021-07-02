@@ -649,6 +649,10 @@
                     type: Boolean,
                     default: false
                 },
+                text: {
+                    type: String,
+                    default: ''
+                },
 
                 //submit
                 pk:{
@@ -891,12 +895,13 @@
                             placement: "top",
                             content: this.tooltip
                         }
-                    }, [h("el-button", props)])
+                    }, [h("el-button", props, this.text)])
                 }
             },
             render(h) {
                 if (undefined != this.visible && this.row.hasOwnProperty(this.visible) && !this.row[this.visible]) return null
                 return h("span", {style: {marginRight: "10px"}}, [this.renderTooltip(), this.render()])
+                
             }
         }
     }()
