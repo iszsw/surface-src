@@ -1,5 +1,5 @@
 /**
- * surfaceTable@last
+ * surfaceTable@latest
  * Gitee https://gitee.com/iszsw/surface-src
  * @author zsw zswemail@qq.com
  */
