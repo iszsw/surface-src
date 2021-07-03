@@ -1978,6 +1978,9 @@
         install = $surfaceForm.install,
         css = '.el-dialog__body{padding:5px 0}.el-upload.el-upload--picture-card{width:100px;height:100px;line-height:100px;position:relative;overflow:hidden;margin-right:10px}.el-upload--picture-card i{font-size:20px;color:#8c939d}.avatar-uploader .el-upload:hover{border-color:#409eff}.avatar-uploader-icon{font-size:28px;color:#8c939d;width:100px;height:100px;text-align:center}.el-upload-list--picture-card .el-upload-list__item{width:100px;height:100px}.c-take-box{padding-left:45px;position:relative;display:inline-block}.c-take-delete{position:absolute;left:25px;top:50%;transform:translateY(-50%);color:#a4a4a4;cursor:pointer}.c-take-add{margin-left:20px}.c-take-content>img{width:40px;height:40px;vertical-align:middle}.c-array-del{top:50%;right:5px;font-size:16px;position:absolute;transform:translateY(-50%)}.w-e-toolbar .w-e-menu i{color:#222!important}.w-e-toolbar .w-e-active i{color:#003cff!important}.s-marker{margin-bottom:0;font-style:italic;font-size:12px;color:#a4a4a4;display:block;line-height:20px}.el-form-item{padding:5px}.hidden{display:none}';
 
+    // 基础样式
+    css += '.el-form:not(.el-form--inline) .s-foot-btn{width: 100%;position:fixed;left: 0;bottom: 0;padding:10px !important;margin-bottom: 0 !important;text-align:center;z-index:1999;background-color: #fff}  .el-form--inline .s-foot-btn > .el-form-item__content {margin-left: 0 !important;}.el-form--inline .s-foot-btn{ display:block !important; margin-left: 100px;}'
+
     styleInject(css);
 
     $surfaceForm.component(
