@@ -641,7 +641,7 @@
                     type: String,
                     default: ''
                 },
-                handler: { // 按钮类型 page:页面 | confirm:确认 | submit:提交 | refresh:刷新
+                handler: { // 按钮类型 page:页面 | confirm:确认 | submit:提交 | refresh:刷新 | search:搜索
                     type: String,
                     default: ''
                 },
@@ -728,6 +728,24 @@
                         case "submit":
                             return this.onSubmit()
                             break;
+                        case "search":
+                            return this.onSearch()
+                            break;
+                    }
+                },
+                onSearch() {
+                    let node = document.getElementById('s-search-collapse')
+                    if (node){
+                        let _h = node.scrollHeight
+                        if (parseInt(node.style.maxHeight) + 50 >= _h) {
+                            node.style.maxHeight = '0px';
+                            node.style.padding = '0px';
+                            node.style.margin = '0px';
+                        }else{
+                            node.style.maxHeight = _h + 'px';
+                            node.style.padding = '20px 0px 0px';
+                            node.style.margin = '10px 0px';
+                        }
                     }
                 },
                 onRefresh() {
@@ -877,8 +895,6 @@
                         }
                     }, this.dialog)
 
-
-
                     return h("el-dialog", dialogProps, this.renderPageChildren(h))
                 },
                 hideDialog() {
@@ -901,7 +917,6 @@
             render(h) {
                 if (undefined != this.visible && this.row.hasOwnProperty(this.visible) && !this.row[this.visible]) return null
                 return h("span", {style: {marginRight: "10px"}}, [this.renderTooltip(), this.render()])
-                
             }
         }
     }()
@@ -920,7 +935,10 @@
             },
             components: componentsInit([buttonComponent]),
             render(h) {
-                return new Render({...this.options}, this).run()
+                return h('div', {}, [
+                    new Render({...this.options}, this).run(),
+                    h('div', {attrs: {id: 's-search-collapse'}})
+                ])
             }
         }
     }()
@@ -1192,45 +1210,45 @@
                 value: function _inject(s) {
                     if (undefined === s.inject) return
                     let _props = s.props,
-                    value = _props.row[_props.column.property || _props.column.prop],
-                    _handler = function _handler(config, data) {
-                        if (isString(config)) {
-                            let rule = config.split('.')
-                            if (rule.length > 1) {
-                                let _val = value
-                                switch (rule[0].toLowerCase()) {
-                                    case 'object':
-                                    case 'array':
-                                        _val = [value]
-                                        break;
-                                    case 'number':
-                                        _val = parseInt(value)
-                                        break;
-                                    case 'float':
-                                        _val = parseFloat(value)
-                                        break;
-                                    case 'boolean':
-                                        _val = !!value
-                                        break;
-                                    case 'string':
-                                    default:
+                        value = _props.row[_props.column.property || _props.column.prop],
+                        _handler = function _handler(config, data) {
+                            if (isString(config)) {
+                                let rule = config.split('.')
+                                if (rule.length > 1) {
+                                    let _val = value
+                                    switch (rule[0].toLowerCase()) {
+                                        case 'object':
+                                        case 'array':
+                                            _val = [value]
+                                            break;
+                                        case 'number':
+                                            _val = parseInt(value)
+                                            break;
+                                        case 'float':
+                                            _val = parseFloat(value)
+                                            break;
+                                        case 'boolean':
+                                            _val = !!value
+                                            break;
+                                        case 'string':
+                                        default:
+                                    }
+                                    data[rule[1]] = _val
+                                } else {
+                                    data[config] = value
                                 }
-                                data[rule[1]] = _val
+                            } else if(isFunction(s.inject)) {
+                                s.inject(s)
                             } else {
-                                data[config] = value
-                            }
-                        } else if(isFunction(s.inject)) {
-                            s.inject(s)
-                        } else {
-                            for (let i in config) {
-                                if (isNaN(i) && !data.hasOwnProperty(i)) {
-                                    data[i] = {}
+                                for (let i in config) {
+                                    if (isNaN(i) && !data.hasOwnProperty(i)) {
+                                        data[i] = {}
+                                    }
+                                    _handler(config[i], isNaN(i) ? data[i] : data)
                                 }
-                                _handler(config[i], isNaN(i) ? data[i] : data)
-                            }
 
-                        }
-                    }(s.inject, s)
+                            }
+                        }(s.inject, s)
 
                     delete s.inject
                 }
@@ -1369,8 +1387,9 @@
 
                         extendVm(options, {on, ref: EL_TABLE_REF, props: {data: []}})
                         this.table = new Render({
-                            el: "s-table",
+                            el: tableComponent.name,
                             ref: SURFACE_TABLE_REF,
+                            class: tableComponent.name,
                             props: {
                                 options: options,
                                 columns
@@ -1397,8 +1416,9 @@
                             }
 
                             this.pagination = new Render({
-                                el: "s-pagination",
+                                el: paginationComponent.name,
                                 ref: SURFACE_PAGINATION_REF,
+                                class: paginationComponent.name,
                                 props: {
                                     options: pagination,
                                 }
@@ -1411,8 +1431,9 @@
                     value: function createHeader(header) {
                         if (header) {
                             this.header = new Render({
-                                el: "s-header",
+                                el: headerComponent.name,
                                 ref: SURFACE_HEADER_REF,
+                                class: headerComponent.name,
                                 props: {
                                     options: {
                                         ...header
@@ -1474,13 +1495,16 @@
     }
 
     // 自定义样式
-    let css = "body{padding: 15px;background-color: #eff1f7}.col-editable{border-bottom:1px dashed #333;}.el-table__fixed-right::before, .el-table__fixed::before{z-index:0 !important}.el-dialog__body{padding:20px 10px 0px}"
+    let css = "body{padding: 15px;background-color: #eff1f7;font-size:14px}.col-editable{border-bottom:1px dashed #333;}.el-table__fixed-right::before, .el-table__fixed::before{z-index:0 !important}.el-dialog__body{padding:20px 10px 0px}"
 
     // table样式
     css += ".el-table{margin-top: 10px;box-shadow: 0px 0px 5px #D8DADF}.el-table thead th{color: #333333;background-color: #ececf1}.el-button--text{padding: 0}.el-table td, .el-table th{padding:15px 0px}"
 
     // 分页样式
     css += ".el-pagination{padding: 30px !important;text-align: center}.el-pagination .el-input__inner {box-shadow: 0px 0px 5px #DCDFE6}.el-pagination button:disabled,.el-pagination .el-pager li,.el-pagination .btn-next, .el-pagination .btn-prev{background-color: transparent}"
+
+    // 搜索
+    css += '#s-search-collapse{padding: 0px;margin:0px;max-height: 0;overflow: hidden;background-color:#fff;box-shadow: 0 1px 5px 2px rgba(64%, 64%, 74%, 0.5) inset;transition: max-height .25s, padding .25s, margin .25s;}'
 
     styleInject(css);
 
