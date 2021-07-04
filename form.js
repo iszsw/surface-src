@@ -829,8 +829,8 @@
     const cw = document.documentElement.clientWidth,
         ch = document.documentElement.clientHeight,
         fullscreen = cw < 850,
-        dialogW = cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
-        iframeH = fullscreen ? (ch - 131) + "px" : "calc(80vh - 150px)"
+        dialogW = cw > 1200 ? cw > 1500 ? '60%' : "75%" : "90%",
+        iframeH = fullscreen ? (ch - 131) + "px" : "calc(80vh - 120px)"
 
     const UPLOAD_COMPONENT = function () {
         const format = function (url) {
@@ -919,9 +919,11 @@
                                     visible: dialogVisible
                                 },
                                 attrs: {
+                                    modal: false,
                                     width: dialogW,
                                     fullscreen: fullscreen,
                                     "append-to-body": true,
+                                    "top": '5vh',
                                     'destroy-on-close': false,
                                     'close-on-press-escape': true,
                                     'close-on-click-modal': true,
@@ -1163,6 +1165,7 @@
                                     visible: this.dialogShow,
                                 },
                                 attrs: {
+                                    modal: false,
                                     width: dialogW,
                                     fullscreen: fullscreen,
                                     "append-to-body": true,
@@ -1388,6 +1391,7 @@
                                     visible: this.dialogShow,
                                 },
                                 attrs: {
+                                    modal: false,
                                     width: dialogW,
                                     fullscreen: fullscreen,
                                     "append-to-body": true,
@@ -1979,7 +1983,10 @@
         css = '.el-dialog__body{padding:5px 0}.el-upload.el-upload--picture-card{width:100px;height:100px;line-height:100px;position:relative;overflow:hidden;margin-right:10px}.el-upload--picture-card i{font-size:20px;color:#8c939d}.avatar-uploader .el-upload:hover{border-color:#409eff}.avatar-uploader-icon{font-size:28px;color:#8c939d;width:100px;height:100px;text-align:center}.el-upload-list--picture-card .el-upload-list__item{width:100px;height:100px}.c-take-box{padding-left:45px;position:relative;display:inline-block}.c-take-delete{position:absolute;left:25px;top:50%;transform:translateY(-50%);color:#a4a4a4;cursor:pointer}.c-take-add{margin-left:20px}.c-take-content>img{width:40px;height:40px;vertical-align:middle}.c-array-del{top:50%;right:5px;font-size:16px;position:absolute;transform:translateY(-50%)}.w-e-toolbar .w-e-menu i{color:#222!important}.w-e-toolbar .w-e-active i{color:#003cff!important}.s-marker{margin-bottom:0;font-style:italic;font-size:12px;color:#a4a4a4;display:block;line-height:20px}.el-form-item{padding:5px}.hidden{display:none}';
 
     // 基础样式
-    css += '.el-form:not(.el-form--inline) .s-foot-btn{width: 100%;position:fixed;left: 0;bottom: 0;padding:10px !important;margin-bottom: 0 !important;text-align:center;z-index:1999;background-color: #fff}  .el-form--inline .s-foot-btn > .el-form-item__content {margin-left: 0 !important;}.el-form--inline .s-foot-btn{ display:block !important; margin-left: 100px;}'
+    css += '.el-form:not(.el-form--inline) .s-foot-btn{width: 100%;position:fixed;left: 0;bottom: 0;padding:10px !important;margin-bottom: 0 !important;text-align:center;z-index:1999;background-color: #fff}  .s-foot-btn > .el-form-item__content {margin-left: 0 !important;}.el-form--inline .s-foot-btn{ display:block !important; margin-left: 100px;}'
+
+    // dialog
+    css += ".el-dialog{box-shadow: 0 3px 1px -2px rgb(0 0 0 / 7%), 0 2px 2px 0 rgb(0 0 0 / 7%), 0 1px 5px 1px rgb(0 0 0 / 7%) !important;}.el-dialog__header{padding: 15px 20px;background-color:#eff1f7}.el-dialog__headerbtn{top: 17px;}"
 
     styleInject(css);
 
