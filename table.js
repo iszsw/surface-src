@@ -601,8 +601,8 @@
     let cw = document.documentElement.clientWidth,
         ch = document.documentElement.clientHeight,
         fullscreen = cw < 950, // table 组件子页面大于 Form
-        dialogW = cw > 1200 ? cw > 1500 ? '50%' : "65%" : "80%",
-        iframeH = fullscreen ? (ch - 81) + "px" : "calc(80vh - 150px)"
+        dialogW = cw > 1200 ? cw > 1500 ? '60%' : "75%" : "90%",
+        iframeH = fullscreen ? (ch - 81) + "px" : "calc(80vh - 40px)"
 
     const buttonComponent = function () {
         const NAME = "s-button"
@@ -689,6 +689,7 @@
             data() {
                 return {
                     pageVisible: false,
+                    fullscreen: false,
                     iframeBtn: [],
                     pageChildren: [],
                 }
@@ -820,7 +821,9 @@
                     this.pageVisible = true
                 },
                 renderPageChildren(h){
-                    let requestUrl = this.url
+                    let requestUrl = this.url,
+                        that = this;
+
                     for (let k in this.data) {
                         if (isNaN(k)) {
                             requestUrl = updateQueryStringParam(requestUrl, k, this.data[k])
@@ -843,6 +846,13 @@
                         }),
                         h("div", {slot: "title"}, [
                             h("span", [this.tooltip]),
+                            h("span", {style: {float: 'right', marginRight: '25px', marginTop: '0px'}}, [
+                                h("i", {class:"el-icon-full-screen", on:{
+                                        click(){
+                                            that.fullscreen = !that.fullscreen
+                                        }
+                                    }}),
+                            ]),
                         ]),
                         this.iframeBtn.length > 0 ? h("span", {slot: "footer"}, this.iframeBtn) : null,
                     ]
@@ -864,11 +874,13 @@
                     let dialogProps = extend({
                         props: {
                             visible: this.pageVisible,
+                            fullscreen: this.fullscreen,
                         },
                         attrs: {
+                            modal: false,
                             width: dialogW,
-                            fullscreen: fullscreen,
                             "append-to-body": true,
+                            "top": '5vh',
                             'destroy-on-close': false,
                             'close-on-press-escape': true,
                             'close-on-click-modal': true,
@@ -1505,6 +1517,9 @@
 
     // 搜索
     css += '#s-search-collapse{padding: 0px;margin:0px;max-height: 0;overflow: hidden;background-color:#fff;box-shadow: 0 1px 5px 2px rgba(64%, 64%, 74%, 0.5) inset;transition: max-height .25s, padding .25s, margin .25s;}'
+
+    // dialog
+    css += ".el-dialog{box-shadow: 0 3px 1px -2px rgb(0 0 0 / 7%), 0 2px 2px 0 rgb(0 0 0 / 7%), 0 1px 5px 1px rgb(0 0 0 / 7%) !important;}.el-dialog__header{padding: 15px 20px;background-color:#eff1f7}.el-dialog__headerbtn{top: 17px;}"
 
     styleInject(css);
 
